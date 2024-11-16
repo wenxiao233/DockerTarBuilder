@@ -6,7 +6,7 @@ on:
       docker_images:
         description: '请填写docker镜像名称 多个用英文逗号分开'
         required: true
-        default: 'alpine:latest,ubuntu:latest'  # 设置默认的 Docker 镜像列表
+        default: 'bitnami/harbor-registry:2,bitnami/harbor-registryctl:2,bitnami/postgresql:13,bitnami/harbor-core:2,bitnami/harbor-portal:2,bitnami/harbor-jobservice:2,bitnami/redis:7.4,bitnami/nginx:1.27'  # 设置默认的 Docker 镜像列表
 
 jobs:
   pull_and_package:
