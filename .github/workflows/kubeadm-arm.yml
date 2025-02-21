@@ -1,4 +1,4 @@
-name: ARM64 Pull and Save Docker Image
+name: ARM64 修改kubeadm证书默认年限
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
 
     - name: 安装go环境
       run: |
-        mkdir /app && cd /app && wget https://dl.google.com/go/go1.13.4.linux-amd64.tar.gz && tar -xf go1.12.7.linux-amd64.tar.gz -C /usr/local/ && export PATH=$PATH:/usr/local/go/bin && go version
+        wget https://dl.google.com/go/go1.13.4.linux-amd64.tar.gz && tar -xf go1.12.7.linux-amd64.tar.gz -C /usr/local/ && export PATH=$PATH:/usr/local/go/bin && go version
 
     - name: 获取k8s源码
       run: |
