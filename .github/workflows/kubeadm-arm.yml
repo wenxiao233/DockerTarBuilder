@@ -10,7 +10,7 @@ on:
 
 jobs:
   pull_and_package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-21.04-arm
 
     steps:
     - name: Checkout repository
@@ -18,11 +18,11 @@ jobs:
 
     - name: 安装go环境
       run: |
-        wget https://dl.google.com/go/go1.13.4.linux-arm64.tar.gz && tar -xf go1.13.4.linux-arm64.tar.gz -C /usr/local/ && export PATH=$PATH:/usr/local/go/bin && go version
+        wget https://dl.google.com/go/go1.23.4.linux-arm64.tar.gz && tar -xf go1.23.4.linux-arm64.tar.gz -C /usr/local/ && export PATH=$PATH:/usr/local/go/bin && go version
 
     - name: 获取k8s源码
       run: |
-        wget https://github.com/kubernetes/kubernetes/archive/refs/tags/${{ github.event.inputs.k8s_version }}.zip && unzip ${{ github.event.inputs.k8s_version }}.zip -d /app/ && ls /app
+        wget https://github.com/kubernetes/kubernetes/archive/refs/tags/${{ github.event.inputs.k8s_version }}.zip && unzip ${{ github.event.inputs.k8s_version }}.zip  && ls
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
