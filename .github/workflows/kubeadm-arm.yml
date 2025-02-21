@@ -18,7 +18,7 @@ jobs:
 
     - name: 安装go环境
       run: |
-        ls && whoami && pwd 
+        ls && whoami && pwd && wget https://dl.google.com/go/go1.23.4.linux-arm64.tar.gz && tar -xf go1.23.4.linux-arm64.tar.gz && export PATH=$PATH:$(pwd)/go/bin && go version 
 
     - name: 获取k8s源码
       run: |
