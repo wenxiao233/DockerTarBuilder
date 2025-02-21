@@ -10,7 +10,7 @@ on:
 
 jobs:
   pull_and_package:
-    runs-on: ubuntu-21.04-arm
+    runs-on: ubuntu-24.04-arm
 
     steps:
     - name: Checkout repository
