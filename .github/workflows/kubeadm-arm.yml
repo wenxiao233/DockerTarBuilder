@@ -19,17 +19,20 @@ jobs:
     - name: 安装go环境
       run: |
         go version
-        ls && whoami && pwd && wget https://dl.google.com/go/go1.23.4.linux-arm64.tar.gz && tar -xf go1.23.4.linux-arm64.tar.gz && export PATH=$PATH:$(pwd)/go/bin && go version 
+        # ls && whoami && pwd && wget https://dl.google.com/go/go1.23.4.linux-arm64.tar.gz && tar -xf go1.23.4.linux-arm64.tar.gz && export PATH=$PATH:$(pwd)/go/bin && go version 
 
     - name: 获取k8s源码
       run: |
         wget https://github.com/kubernetes/kubernetes/archive/refs/tags/${{ github.event.inputs.k8s_version }}.zip && unzip -q ${{ github.event.inputs.k8s_version }}.zip  && ls
-
+        sed -i 's/24 * 365/24 * 365 * 100/g' ./kubernetes/cmd/kubeadm/app/constants/constants.go
+        sed -i 's/duration365d * 10/duration365d * 100/g' ./kubernetes/staging/src/k8s.io/client-go/util/cert/cert.go
+        sed -ri 's#KUBE_GIT_TREE_STATE="dirty"#KUBE_GIT_TREE_STATE="clean"#g' ./kubernetes/hack/lib/version.sh
+        cd kubernetes/ && make all WHAT=cmd/kubeadm GOFLAGS=-v && ls _output/local/bin/linux/
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: docker-images-tar
-        path: arm64-images.tar.gz
+        path: _output/local/bin/linux/arm64/kubeadm
         retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
 
     - name: Clean up intermediate files
