@@ -27,7 +27,7 @@ jobs:
         sed -i 's/24 * 365/24 * 365 * 100/g' ./kubernetes/cmd/kubeadm/app/constants/constants.go
         sed -i 's/duration365d * 10/duration365d * 100/g' ./kubernetes/staging/src/k8s.io/client-go/util/cert/cert.go
         sed -ri 's#KUBE_GIT_TREE_STATE="dirty"#KUBE_GIT_TREE_STATE="clean"#g' ./kubernetes/hack/lib/version.sh
-        cd kubernetes/ && make all WHAT=cmd/kubeadm GOFLAGS=-v && ls _output/local/bin/linux/
+        cd kubernetes-1.18.6/ && make all WHAT=cmd/kubeadm GOFLAGS=-v && ls _output/local/bin/linux/
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
