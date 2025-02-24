@@ -6,7 +6,7 @@ on:
       k8s_version:
         description: '请填写k8s的版本'
         required: true
-        default: 'v1.18.6'  # 设置默认的 Docker 镜像列表
+        default: '1.18.6'  # 设置默认的 Docker 镜像列表
 
 jobs:
   pull_and_package:
@@ -23,7 +23,7 @@ jobs:
 
     - name: 获取k8s源码
       run: |
-        wget https://github.com/kubernetes/kubernetes/archive/refs/tags/${{ github.event.inputs.k8s_version }}.zip && unzip -q ${{ github.event.inputs.k8s_version }}.zip  && ls
+        wget https://github.com/kubernetes/kubernetes/archive/refs/tags/v${{ github.event.inputs.k8s_version }}.zip && unzip -q v${{ github.event.inputs.k8s_version }}.zip  && ls
         sed -i 's/24 * 365/24 * 365 * 100/g' ./kubernetes-${{ github.event.inputs.k8s_version }}/cmd/kubeadm/app/constants/constants.go
         sed -i 's/duration365d * 10/duration365d * 100/g' ./kubernetes-${{ github.event.inputs.k8s_version }}/staging/src/k8s.io/client-go/util/cert/cert.go
         sed -ri 's#KUBE_GIT_TREE_STATE="dirty"#KUBE_GIT_TREE_STATE="clean"#g' ./kubernetes-${{ github.event.inputs.k8s_version }}/hack/lib/version.sh
