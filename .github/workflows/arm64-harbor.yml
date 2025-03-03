@@ -19,7 +19,7 @@ jobs:
     - name: 查看基础环境
       run: |
         docker version
-        docker-compose version || curl https://github.com/docker/compose/releases/download/v2.33.1/docker-compose-linux-aarch64 -O docker-compose && export PATH=${PATH}:${{ github.workspace }}/docker-compose
+        docker-compose version || curl https://github.com/docker/compose/releases/download/v2.33.1/docker-compose-linux-aarch64 -O docker-compose && export PATH=${PATH}:${{ github.workspace }} && docker-compose version
         python -V
         git --version
         make --version
@@ -27,7 +27,7 @@ jobs:
 
     - name: 获取harbor源码
       run: |
-        git clone https://github.com/goharbor/harbor -b ${{ github.event.inputs.harbor_version }}
+        git clone -b ${{ github.event.inputs.harbor_version }} https://github.com/goharbor/harbor.git
 
     - name: 编译harbor
       run: |
