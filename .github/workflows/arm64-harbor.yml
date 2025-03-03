@@ -19,7 +19,7 @@ jobs:
     - name: 查看基础环境
       run: |
         docker version
-        docker-compose version
+        docker-compose version || curl https://github.com/docker/compose/releases/download/v2.33.1/docker-compose-linux-aarch64 -O docker-compose && export PATH=${PATH}:${{ github.workspace }}/docker-compose
         python -V
         git --version
         make --version
