@@ -32,7 +32,7 @@ jobs:
 
     - name: 编译harbor
       run: |
-        cd harbor && make install COMPILETAG=compile_golangimage && ls
+        cd harbor && sed -i 's/amd64/arm64/g' tools/swagger/Dockerfile && make install COMPILETAG=compile_golangimage && ls
         
     - name: List generated files (debug step)
       run: |
