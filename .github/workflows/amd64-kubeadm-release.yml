@@ -28,7 +28,7 @@ jobs:
         sed -i 's/24 * 365/24 * 365 * 100/g' ./kubernetes-${{ github.event.inputs.k8s_version }}/cmd/kubeadm/app/constants/constants.go
         sed -i 's/duration365d * 10/duration365d * 100/g' ./kubernetes-${{ github.event.inputs.k8s_version }}/staging/src/k8s.io/client-go/util/cert/cert.go
         sed -ri 's#KUBE_GIT_TREE_STATE="dirty"#KUBE_GIT_TREE_STATE="clean"#g' ./kubernetes-${{ github.event.inputs.k8s_version }}/hack/lib/version.sh
-        cd kubernetes-${{ github.event.inputs.k8s_version }}/ && make all WHAT=cmd/kubeadm GOFLAGS=-v && ls _output/local/bin/linux/ && mv amd64/kubeadm amd64/kubeadm-amd64-v${{ github.event.inputs.k8s_version }}
+        cd kubernetes-${{ github.event.inputs.k8s_version }}/ && make all WHAT=cmd/kubeadm GOFLAGS=-v > /dev/null && ls _output/local/bin/linux/ && mv _output/local/bin/linux/amd64/kubeadm _output/local/bin/linux/amd64/kubeadm-amd64-v${{ github.event.inputs.k8s_version }}
         
     - name: List generated files (debug step)
       run: |
