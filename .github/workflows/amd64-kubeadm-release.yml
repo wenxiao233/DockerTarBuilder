@@ -1,5 +1,5 @@
 
-name: AMD 修改kubeadm证书默认年限
+name: AMD64 修改kubeadm证书默认年限
 
 on:
   workflow_dispatch:
