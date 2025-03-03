@@ -6,7 +6,7 @@ on:
       harbor_version:
         description: '请填写harbor的版本'
         required: true
-        default: 'v1.12.2'  # 设置默认的 harbor 版本
+        default: 'v2.12.2'  # 设置默认的 harbor 版本
 
 jobs:
   pull_and_package:
