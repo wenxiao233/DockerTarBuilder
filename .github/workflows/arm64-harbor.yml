@@ -1,0 +1,73 @@
+name: 编译harbor-arm
+
+on:
+  workflow_dispatch:
+    inputs:
+      harbor_version:
+        description: '请填写harbor的版本'
+        required: true
+        default: 'v1.12.2'  # 设置默认的 harbor 版本
+
+jobs:
+  pull_and_package:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 查看基础环境
+      run: |
+        docker version
+        docker-compose version
+        python -V
+        git --version
+        make --version
+        go version
+
+    - name: 获取harbor源码
+      run: |
+        git clone https://github.com/goharbor/harbor -b ${{ github.event.inputs.harbor_version }}
+
+    - name: 编译harbor
+      run: |
+        cd harbor && make install COMPILETAG=compile_golangimage && ls
+        
+    - name: List generated files (debug step)
+      run: |
+         echo "Preparing docker images list (.tar.gz) files:"
+         find $GITHUB_WORKSPACE -name "kubeadm"
+         release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
+         echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
+
+    - name: List generated files (debug step)
+      run: |
+        echo "Preparing docker images list (.tar.gz) files:"
+        find $GITHUB_WORKSPACE -name "kubeadm"
+        release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
+        echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@master
+      with:
+        tag_name: DockerTarBuilder-ARM64
+        name: ${{ env.RELEASE_NAME }} for ARM64
+        body: |
+          [![Github](https://img.shields.io/badge/RELEASE:DockerTarBuilder-123456?logo=github&logoColor=fff&labelColor=green&style=for-the-badge)](https://www.bilibili.com/video/BV1EZ421M7mL) [![Github](https://img.shields.io/badge/国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://wkdaily.cpolar.top/archives/1)
+          ### How to use? For example
+          `docker load -i alpine_latest.tar.gz `
+          ### Video teaching
+          [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1yyq6YREdF)
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Docker images as release assets
+      uses: softprops/action-gh-release@v2.1.0
+      with:
+        tag_name: DockerTarBuilder-ARM64
+        files: ${{ github.workspace }}/kubernetes-${{ github.event.inputs.k8s_version }}/_output/local/bin/linux/arm64/kubeadm-arm64-v${{ github.event.inputs.k8s_version }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
