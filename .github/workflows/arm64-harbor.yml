@@ -28,7 +28,7 @@ jobs:
 
     - name: 获取harbor源码
       run: |
-        git clone -b ${{ github.event.inputs.harbor_version }} https://github.com/goharbor/harbor.git
+        git clone --branch ${{ github.event.inputs.harbor_version }} https://github.com/goharbor/harbor.git
 
     - name: 编译harbor
       run: |
