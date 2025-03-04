@@ -32,14 +32,11 @@ jobs:
 
     - name: 编译harbor
       run: |
-        cd harbor && sed -i 's/amd64/arm64/g' tools/swagger/Dockerfile && make package_offline NOTARYFLAG=true CHARTFLAG=true TRIVYFLAG=true PULL_BASE_FROM_DOCKERHUB=false && ls
-        
-    - name: List generated files (debug step)
-      run: |
-         echo "Preparing docker images list (.tar.gz) files:"
-         find $GITHUB_WORKSPACE -name "kubeadm"
-         release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
-         echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
+        cd harbor
+        sed -i 's/amd64/arm64/g' tools/swagger/Dockerfile
+        sed -i 's/x86_64/arm64/g' tools/mockery/Dockerfile
+        make package_offline NOTARYFLAG=true CHARTFLAG=true TRIVYFLAG=true PULL_BASE_FROM_DOCKERHUB=false PKGVERSIONTAG=${{ github.event.inputs.harbor_version }}
+        ls
 
     - name: List generated files (debug step)
       run: |
@@ -68,7 +65,7 @@ jobs:
       uses: softprops/action-gh-release@v2.1.0
       with:
         tag_name: DockerTarBuilder-ARM64
-        files: ${{ github.workspace }}/kubernetes-${{ github.event.inputs.k8s_version }}/_output/local/bin/linux/arm64/kubeadm-arm64-v${{ github.event.inputs.k8s_version }}
+        files: ${{ github.workspace }}/harbor
         token: ${{ secrets.GITHUB_TOKEN }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
