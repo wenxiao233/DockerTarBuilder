@@ -65,7 +65,7 @@ jobs:
       uses: softprops/action-gh-release@v2.1.0
       with:
         tag_name: DockerTarBuilder-ARM64
-        files: ${{ github.workspace }}/harbor-offline-installer-${{ github.event.inputs.harbor_version }}.tgz
+        files: ${{ github.workspace }}/harbor/harbor-offline-installer-${{ github.event.inputs.harbor_version }}.tgz
         token: ${{ secrets.GITHUB_TOKEN }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
