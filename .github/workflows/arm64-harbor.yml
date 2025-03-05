@@ -52,14 +52,36 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@master
       with:
-        tag_name: Harbor-arm64-${{ github.event.inputs.harbor_version }}
-        name: ${{ env.RELEASE_NAME }} for ARM64
+        tag_name: harbor-arm
+        name: harbor-arm
         body: |
-          [![Github](https://img.shields.io/badge/RELEASE:DockerTarBuilder-123456?logo=github&logoColor=fff&labelColor=green&style=for-the-badge)](https://www.bilibili.com/video/BV1EZ421M7mL) [![Github](https://img.shields.io/badge/国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://wkdaily.cpolar.top/archives/1)
-          ### How to use? For example
-          `docker load -i alpine_latest.tar.gz `
-          ### Video teaching
-          [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1yyq6YREdF)
+          ```shell
+          # 上传到服务器并解压
+          tar -xf harbor-offline-installer-${{ github.event.inputs.harbor_version }}.tgz
+          
+          # 修改配置
+          cd harbor
+          cp harbor.yml.tmpl harbor.yml
+          vi harbor.yml
+          # 修改host
+          hostname: xx.xx.xx.xx
+          # 注掉如下部分，内网使用http协议就行
+          # https related config
+          # https:
+            # https port for harbor, default is 443
+            # port: 443
+            # The path of cert and key files for nginx
+            # certificate: /your/certificate/path
+            # private_key: /your/private/key/path
+          # 修改存储路径
+          data_volume: /home/harbor-data
+          
+          # 安装
+          docker load -i harbor.${{ github.event.inputs.harbor_version }}.tar.gz
+          ./prepare
+          chmod -R 777 common
+          ./install.sh
+          ```
         draft: false
         prerelease: false
       env:
@@ -68,7 +90,7 @@ jobs:
     - name: Upload Docker images as release assets
       uses: softprops/action-gh-release@v2.1.0
       with:
-        tag_name: DockerTarBuilder-ARM64
+        tag_name: harbor-arm
         files: ${{ github.workspace }}/harbor/harbor-offline-installer-${{ github.event.inputs.harbor_version }}.tgz
         token: ${{ secrets.GITHUB_TOKEN }}
       env:
