@@ -48,13 +48,26 @@ jobs:
       uses: softprops/action-gh-release@master
       with:
         tag_name: kubeadm-100cer
-        name: ${{ env.RELEASE_NAME }} for AMD64
+        name: kubeadm-100cer
         body: |
-          [![Github](https://img.shields.io/badge/RELEASE:DockerTarBuilder-123456?logo=github&logoColor=fff&labelColor=green&style=for-the-badge)](https://www.bilibili.com/video/BV1EZ421M7mL) [![Github](https://img.shields.io/badge/国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://wkdaily.cpolar.top/archives/1)
-          ### How to use? For example
-          `docker load -i alpine_latest.tar.gz `
-          ### Video teaching
-          [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1yyq6YREdF)
+          ```shell
+          # 1、将原有证书进行备份
+          cp -a /etc/kubernetes/pki /etc/kubernetes/pki_bak
+          
+          # 2、 将kubeadm 文件拷贝替换系统中原有kubeadm
+          cp /usr/bin/kubeadm /usr/bin/kubeadm.bak
+          
+          # 3、 续订全部证书
+          kubeadm certs renew all
+          kubeadm alpha certs renew all （1.18.6用这个命令）
+          
+          # 4、重启kube-apiserver, kube-controller-manager, kube-scheduler、etcd
+          docker ps | grep -v pause | grep -E "etcd|scheduler|controller|apiserver" | awk '{print $1}' | awk '{print "docker","restart",$1}' | bash
+          
+          # 5、查看证书过期时间
+          kubeadm certs check-expiration
+          kubeadm alpha certs check-expiration
+          ```
         draft: false
         prerelease: false
       env:
@@ -63,7 +76,7 @@ jobs:
     - name: Upload Docker images as release assets
       uses: softprops/action-gh-release@v2.1.0
       with:
-        tag_name: DockerTarBuilder-AMD64
+        tag_name: kubeadm-100cer
         files: ${{ github.workspace }}/kubernetes-${{ github.event.inputs.k8s_version }}/_output/local/bin/linux/amd64/kubeadm-amd64-v${{ github.event.inputs.k8s_version }}
         token: ${{ secrets.GITHUB_TOKEN }}
       env:
