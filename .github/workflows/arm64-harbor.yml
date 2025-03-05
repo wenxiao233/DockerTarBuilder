@@ -35,7 +35,9 @@ jobs:
         cd harbor
         sed -i 's/amd64/arm64/g' tools/swagger/Dockerfile
         sed -i 's/x86_64/arm64/g' tools/mockery/Dockerfile
-        make package_offline NOTARYFLAG=true CHARTFLAG=true TRIVYFLAG=true PULL_BASE_FROM_DOCKERHUB=false PKGVERSIONTAG=${{ github.event.inputs.harbor_version }}
+        echo "ignore-warnings ARM64-COW-BUG" >> make/photon/redis/redis.conf
+        echo "FROM redis:7.2.6" > make/photon/redis/Dockerfile.base
+        make package_offline NOTARYFLAG=true CHARTFLAG=true TRIVYFLAG=true PULL_BASE_FROM_DOCKERHUB=false PKGVERSIONTAG=${{ github.event.inputs.harbor_version }} BASEIMAGETAG=${{ github.event.inputs.harbor_version }}
         ls
 
     - name: List generated files (debug step)
