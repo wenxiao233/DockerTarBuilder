@@ -1,0 +1,84 @@
+name: 编译redis-arm
+
+on:
+  workflow_dispatch:
+    inputs:
+      redis_version:
+        description: '请填写redis的版本'
+        required: true
+        default: '7.4.6'  # 设置默认的 redis 版本
+
+jobs:
+  pull_and_package:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 查看基础环境
+      run: |
+        docker version
+        python -V
+        git --version
+        make --version
+        go version
+
+    - name: 获取harbor源码
+      run: |
+        git clone --branch ${{ github.event.inputs.redis_version }} https://github.com/redis/redis.git
+
+    - name: 编译harbor
+      run: |
+        cd redis
+        make && make --PREFIX=./soft/ install
+        cat > Dockerfile << EOF
+        FROM www.sjgjj.cn:10443/base/ubuntu:arm-24.04
+        ADD ./soft/bin/* /usr/bin/
+        ADD ./redis.conf /etc/redis.conf
+        CMD ["redis-server","/etc/redis.conf"]
+        EOF
+        docker build -f Dockerfile -t ubuntu-redis:arm64-${{ github.event.inputs.redis_version }} .
+        docker save -o ubuntu-redis-arm64-${{ github.event.inputs.redis_version }}.tar.gz ubuntu-redis:arm64-${{ github.event.inputs.redis_version }}
+        #cd harbor
+        #sed -i 's/amd64/arm64/g' tools/swagger/Dockerfile
+        #sed -i 's/x86_64/arm64/g' tools/mockery/Dockerfile
+        # 增加配置，否则redis无法启动
+        #echo "ignore-warnings ARM64-COW-BUG" >> make/photon/redis/redis.conf
+        # 使用官方redis镜像，这里使用Ubuntu构建的redis会因为arm架构pagesize不同，无法在麒麟V10服务器上使用
+        #echo "FROM redis:7.2.6" > make/photon/redis/Dockerfile.base
+        #make package_offline NOTARYFLAG=true CHARTFLAG=true TRIVYFLAG=true PULL_BASE_FROM_DOCKERHUB=false PKGVERSIONTAG=${{ github.event.inputs.harbor_version }} VERSIONTAG=${{ github.event.inputs.harbor_version }}
+        #ls
+
+    - name: List generated files (debug step)
+      run: |
+        echo "Preparing docker images list (.tar.gz) files:"
+        find $GITHUB_WORKSPACE -name "*ubuntu-redis-arm64*"
+        release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
+        echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@master
+      with:
+        tag_name: redis-arm
+        name: redis-arm
+        body: |
+          ```shell
+          # 上传到服务器并解压
+          tar -xf harbor-offline-installer-${{ github.event.inputs.harbor_version }}.tgz
+          
+          docke load -i harbor-offline-installer-${{ github.event.inputs.harbor_version }}.tgz
+          ```
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Docker images as release assets
+      uses: softprops/action-gh-release@v2.1.0
+      with:
+        tag_name: harbor-arm
+        files: ${{ github.workspace }}/redis/ubuntu-redis:arm64-${{ github.event.inputs.redis_version }}.tar.gz
+        token: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
