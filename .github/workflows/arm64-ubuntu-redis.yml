@@ -33,7 +33,7 @@ jobs:
         cd redis
         make && make PREFIX=soft install
         cat > Dockerfile << EOF
-        FROM www.sjgjj.cn:10443/base/ubuntu:arm-24.04
+        FROM ubuntu:24.04
         ADD ./soft/bin/* /usr/bin/
         ADD ./redis.conf /etc/redis.conf
         CMD ["redis-server","/etc/redis.conf"]
