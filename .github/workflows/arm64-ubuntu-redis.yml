@@ -31,7 +31,7 @@ jobs:
     - name: 编译harbor
       run: |
         cd redis
-        make && make PREFIX=soft install
+        make && make PREFIX=./soft install
         cat > Dockerfile << EOF
         FROM ubuntu:24.04
         ADD ./soft/bin/* /usr/bin/
