@@ -31,7 +31,7 @@ jobs:
     - name: 编译harbor
       run: |
         cd redis
-        make && make PREFIX=./soft install
+        make && make PREFIX=${{ github.workspace }}/redis/soft install
         cat > Dockerfile << EOF
         FROM ubuntu:24.04
         ADD ./soft/bin/* /usr/bin/
@@ -39,7 +39,7 @@ jobs:
         CMD ["redis-server","/etc/redis.conf"]
         EOF
         docker build -f Dockerfile -t ubuntu-redis:arm64-${{ github.event.inputs.redis_version }} .
-        docker save -o ubuntu-redis-arm64-${{ github.event.inputs.redis_version }}.tar.gz ubuntu-redis:arm64-${{ github.event.inputs.redis_version }}
+        docker save -o ${{ github.workspace }}/redis/ubuntu-redis-arm64-${{ github.event.inputs.redis_version }}.tar.gz ubuntu-redis:arm64-${{ github.event.inputs.redis_version }}
         #cd harbor
         #sed -i 's/amd64/arm64/g' tools/swagger/Dockerfile
         #sed -i 's/x86_64/arm64/g' tools/mockery/Dockerfile
