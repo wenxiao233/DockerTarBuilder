@@ -78,7 +78,7 @@ jobs:
       uses: softprops/action-gh-release@v2.1.0
       with:
         tag_name: harbor-arm
-        files: ${{ github.workspace }}/redis/ubuntu-redis:arm64-${{ github.event.inputs.redis_version }}.tar.gz
+        files: ${{ github.workspace }}/redis/ubuntu-redis-arm64-${{ github.event.inputs.redis_version }}.tar.gz
         token: ${{ secrets.GITHUB_TOKEN }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
